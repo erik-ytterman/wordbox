@@ -2,8 +2,56 @@
 import sys
 import random
 
-class treenode:
+# Contain playfield state
+class state:
+    data = None
     
+    def __init__(self, rows, columns):
+        self.data = [ [ '*' for i in range(columns) ] for j in range(rows) ]
+
+    def setrow(self, word, index):
+        if len(word) <= len(self.data):
+            for i, char in enumerate(list(word)): 
+                self.data[index][i] = char
+        else:
+            raise Exception
+
+    def getrow(self, index):
+        return ''.join([char for char in self.data[index]])
+        
+    def setcol(self, word, index):
+        if len(word) <= len(self.data):
+            for i, char in enumerate(word):
+                self.data[i][index] = char
+        else:
+            raise Exception
+
+    def getcol(self, index):
+        cols = list(zip(*self.data))
+        return ''.join(cols[index])
+
+    def dumptext(self, index = None):
+        if index == None:
+            for row in self.data:
+                print(''.join(row))
+        else:
+            print(self.data[index])
+
+# Validate playfield state
+class validator:
+    wordlist = None
+
+# Find possible new playfield states
+class finder:
+    wordlist = None
+
+# Store playfield state graph
+class tree:
+    state = None
+    children = []
+
+
+#################################################################################################
 
 count = 5
 
@@ -13,19 +61,34 @@ worddata = [ normalizer(word) for word in open("swedish-word-list.txt", encoding
 
 wordlist = tuple( { word for word in sorted(worddata) if len(word) == count } )
 
-rows = list()
+s = state(14, 17)
 
-for i in range(count):
-    if not rows:
-        candidates = wordlist
-    else:
-        candidates = ("APANS",)
+print(50 * "E")
 
-    rows.append(random.choice(candidates))
+# Row manipulation
 
-def addnode(parent, candidates)
+s.setrow("APANS", 3);
 
-    
-print("-" * 40)
-for i, row in enumerate(rows):
-    print(i, row)
+print(40 * "R")
+
+print(s.getrow(3))
+print(s.getrow(4))
+
+print(40 * "R")
+
+s.dumptext()
+
+# Column manipulation
+
+s.setcol("APANS", 3);
+
+print(40 * "C")
+
+print(s.getcol(3))
+print(s.getcol(4))
+
+print(40 * "C")
+
+s.dumptext()
+
+print(50 * "E")
