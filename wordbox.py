@@ -1,34 +1,28 @@
 #! /usr/bin/python3
 import sys
 import random
+import re
 
 # Contain playfield state
-class state:
+class playstate:
     data = None
-    
+    size = (0,0)
+
     def __init__(self, rows, columns):
-        self.data = [ [ '*' for i in range(columns) ] for j in range(rows) ]
+        self.size = (rows, columns)
+        self.data = [ [ '.' for i in range(columns) ] for j in range(rows) ]
+
+    def getsize(self):
+        return self.size
 
     def setrow(self, word, index):
-        if len(word) <= len(self.data):
-            for i, char in enumerate(list(word)): 
-                self.data[index][i] = char
-        else:
-            raise Exception
+        self.data[index] = list(word)
 
     def getrow(self, index):
-        return ''.join([char for char in self.data[index]])
-        
-    def setcol(self, word, index):
-        if len(word) <= len(self.data):
-            for i, char in enumerate(word):
-                self.data[i][index] = char
-        else:
-            raise Exception
+        return ''.join(self.data[index])
 
-    def getcol(self, index):
-        cols = list(zip(*self.data))
-        return ''.join(cols[index])
+    def getkeys(self):
+        return [ ''.join(t) for t in tuple(zip(*self.data)) ]
 
     def dumptext(self, index = None):
         if index == None:
@@ -38,20 +32,32 @@ class state:
             print(self.data[index])
 
 # Validate playfield state
-class validator:
+class statevalidator:
     wordlist = None
 
 # Find possible new playfield states
-class finder:
+class statefinder:
     wordlist = None
 
+    def __init__(self, wordlist):
+        print(len(wordlist))
+        self.wordlist = wordlist
+
+    def states(state):
+        return
+
 # Store playfield state graph
-class tree:
+class treenode:
     state = None
     children = []
 
+    def __init__(self, state):
+        self.state = state
 
-#################################################################################################
+##########################################################################################
+
+def treebuilder(rootnode):
+    return None
 
 count = 5
 
@@ -61,34 +67,26 @@ worddata = [ normalizer(word) for word in open("swedish-word-list.txt", encoding
 
 wordlist = tuple( { word for word in sorted(worddata) if len(word) == count } )
 
-s = state(14, 17)
+state = playstate(count, count)
 
-print(50 * "E")
+validator = statevalidator()
 
-# Row manipulation
+finder = statefinder(wordlist)
 
-s.setrow("APANS", 3);
+print(50 * '-');
+state.dumptext()
 
-print(40 * "R")
+state.setrow("BEPAN",0)
+state.setrow("URNAN",1)
 
-print(s.getrow(3))
-print(s.getrow(4))
+print(50 * '-');
+state.dumptext()
 
-print(40 * "R")
+print(50 * '-');
 
-s.dumptext()
+keys = state.getkeys()
 
-# Column manipulation
-
-s.setcol("APANS", 3);
-
-print(40 * "C")
-
-print(s.getcol(3))
-print(s.getcol(4))
-
-print(40 * "C")
-
-s.dumptext()
-
-print(50 * "E")
+for key in keys:
+    print("Matching '" + key + "' ...")
+    words = [ w for w in wordlist if re.match(key, w) ]
+    print(words)
