@@ -1,7 +1,10 @@
 #! /usr/bin/python3
 import sys
 import random
+import copy
 import re
+
+from functools import reduce
 
 # Contain playfield state
 class playstate:
@@ -24,40 +27,14 @@ class playstate:
     def getkeys(self):
         return [ ''.join(t) for t in tuple(zip(*self.data)) ]
 
-    def dumptext(self, index = None):
+    def dumptext(self, index = None, indent = 0):
         if index == None:
             for row in self.data:
-                print(''.join(row))
+                print(indent * " " + ''.join(row))
         else:
             print(self.data[index])
 
-# Validate playfield state
-class statevalidator:
-    wordlist = None
-
-# Find possible new playfield states
-class statefinder:
-    wordlist = None
-
-    def __init__(self, wordlist):
-        print(len(wordlist))
-        self.wordlist = wordlist
-
-    def states(state):
-        return
-
-# Store playfield state graph
-class treenode:
-    state = None
-    children = []
-
-    def __init__(self, state):
-        self.state = state
-
 ##########################################################################################
-
-def treebuilder(rootnode):
-    return None
 
 count = 5
 
@@ -67,26 +44,63 @@ worddata = [ normalizer(word) for word in open("swedish-word-list.txt", encoding
 
 wordlist = tuple( { word for word in sorted(worddata) if len(word) == count } )
 
+state = []
+choice = []
+
+for row in range(3):
+    print(10 * 'R' + 40 * str(row))
+
+    sample = random.choice(wordlist)
+    choice.append(list(sample))
+
+    for c in choice:
+        print(c)
+
+    print(10 * 'S' + 40 * str(row))
+
+    L = [ (i, ''.join(column), tuple([ w for w in wordlist if w.startswith(''.join(column)) ]) ) for i, column in enumerate(zip(*choice)) ]
+    
+    for i,l in enumerate(L): 
+        print(10 * "C" + 40 * str(i))
+        print(len(l[2]), l)
+
+    print(10 * 'R' + 40 * str(row))
+
+'''
+class treenode:
+    state = None
+    children = []
+
+    def __init__(self, state):
+        self.state = state
+
+def buildtree(level, node):
+    for j, word in enumerate(wordlist):
+        if(level < count):
+            state = playstate(count, count)
+            state.data = copy.deepcopy(node.state.data)
+            state.size = copy.copy(node.state.size)
+
+            state.setrow(word, level)
+            
+            results = [ [ w for w in wordlist if re.match(key, w) ] for key in state.getkeys() ]
+        
+            if not [] in results:
+                print("Level: " + str(level))
+                state.dumptext()
+                newnode = treenode(state)
+                node.children.append(newnode)
+                buildtree(level+1, newnode)
+        else:
+            print("SOLUTION!")
+            node.state.dumptext()
+
+        if( j % 100 == 0 ):
+            sys.stdout.write('+')
+            sys.stdout.flush()
+
 state = playstate(count, count)
+root = treenode(state)
 
-validator = statevalidator()
-
-finder = statefinder(wordlist)
-
-print(50 * '-');
-state.dumptext()
-
-state.setrow("BEPAN",0)
-state.setrow("URNAN",1)
-
-print(50 * '-');
-state.dumptext()
-
-print(50 * '-');
-
-keys = state.getkeys()
-
-for key in keys:
-    print("Matching '" + key + "' ...")
-    words = [ w for w in wordlist if re.match(key, w) ]
-    print(words)
+buildtree(0, root)
+'''
