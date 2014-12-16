@@ -7,9 +7,11 @@ import re
 
 class treenode:
     state = None
+    parent = None
     children = []
     
-    def __init__(self, state):
+    def __init__(self, state, parent):
+        self.parent = parent
         self.state = list(state)
 
 def charmatcher(word, charsets):
@@ -30,29 +32,36 @@ def wordmatcher(state, wordset):
 
         return { word for word in wordset if charmatcher(word, charsets) }
 
+def printsolution(node, recurse = False):
+    if not node == None:
+        for row in node.state:
+            print(row)
+        
+        if recurse:
+            print(30 * '-')
+            printpath(node.parent)
+
 def treebuilder(node, depth, maxdepth, wordset):
     if depth < maxdepth:
         for word in wordmatcher(node.state, wordset):
-            newnode = treenode(node.state)
-        
+            newnode = treenode(node.state, node)
+            
             newnode.state.append(word)
             
             node.children.append(newnode)
         
             treebuilder(newnode, depth + 1, maxdepth, wordset)
     else:
-        print(30 * '-')
-
-        for row in node.state:
-            print(row)
-
+        print(30 * 'v')
+        printsolution(node)
+        print(30 * '^')
 
 maxdepth = 5
 normalizer = lambda line: line.strip().upper()
 worddata = [ normalizer(word) for word in open("swedish-word-list.txt", encoding="ISO-8859-1") ]
 wordset = { word for word in sorted(worddata) if len(word) == maxdepth }
 
-root = treenode([])
+root = treenode([], None)
 treebuilder(root, 0, maxdepth, wordset)
 
 
