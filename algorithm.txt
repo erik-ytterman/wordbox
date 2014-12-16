@@ -1,0 +1,103 @@
+Objective: Select possible words for line three
+
+1. Initial state
+
+      n = max index for string in row is four (4)
+      |
+      V
+  01234
+0 APAES
+1 LEPRO <- m = max index in state state list is one (1)
+2 ?????
+3 ?????
+4 ????? 
+
+2. Extract keys to find possible words for columns
+
+      n = max index for string in row is four (4)
+      |
+      V
+  01234
+0 APAES
+1 LEPRO <- m = max index in state state list is one (1)
+2 ?????
+3 ?????
+4 ????? 
+
+Example:
+
+Key for column zero (0) will be: row[0][0] + row[1][0] = 'AL'
+Key for column one (1) will be: row[0][1] + row[1][1] = 'PE'
+Key for column n (n) will be: row[0][n] + row[1][n] + ... row[m][n]
+
+Result:
+
+columnkeys = ['AL', 'PE', 'AP', 'ER', 'SO']
+
+3. Extract possible words for every column
+
+      n = max index for string in row is four (4)
+      |
+      V
+  01234
+0 APAES
+1 LEPRO <- m = max index in state state list is one (1)
+2 ?????
+3 ?????
+4 ????? 
+
+Example:
+
+For every word in the wordset:
+    For every column:
+        select word if word starts with columnkey for column
+
+Select the word "ALFER" for the list of possible words for column one (1)
+
+Result:
+
+columnnr, columnkey, words (truncated), number of words possible for column
+
+0, AL, ['ALLRA', 'ALFER', 'ALNEN', 'ALICE', 'ALBAS'], 61
+1, PE, ['PETRA', 'PEKAS', 'PEPPA', 'PEABS', 'PESTS'], 31
+2, AP, ['APATI', 'APPLE', 'APRIL', 'APELS', 'APANS'], 13
+3, ER, ['ERICS', 'ERNÅS', 'ERANS', 'ERFAR', 'ERNST'], 11
+4, SO, ['SOJAN', 'SOLÅR', 'SOARÉ', 'SOPOR', 'SOVER'], 64
+
+4. Extract possible characters for every string index in row two (2)
+
+      n = max index for string in row is four (4)
+      |
+      V
+  01234
+0 APAES
+1 LEPRO <- m = max index in state state list is one (1)
+2 ????? <- Find possible characters for every string index in row[m+1] (2) 
+3 ?????
+4 ????? 
+
+One instance of the possible characters are given by the third character
+in every possible column word.
+
+Example:
+
+  01234
+0 APAES
+1 LEPRO <- m = max index in state state list is one (1)
+2(LAPAT) <- Find possible characters for every string index in row[m+1] (2)
+3 RBLNE
+4 ASEST
+
+Columns: ALLRA, PEABS, APPLE, ERANS, SOTET -> 
+
+word = row[m+1] = [ {'L'}, {'A'}, {'P'}, {'A'}, {'T'} ]
+
+5. Gather all possible unique characters for every string position in row[m+1]
+
+ALFER, PETRA, APRIL, ERFAR, SOPOR -> row[m+1] =>
+ 
+lettersets = [ {'L', 'F'}, {'A', 'T'}, {'P', 'R'}, {'A', 'F'}, {'T', 'P'} ]
+
+6. Select all words from wordset where word[i] is in letterset[i] for i = 0-4 (columns)
+
+
