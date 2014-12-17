@@ -36,13 +36,14 @@ def wordmatcher(state, wordset):
 
 def treebuilder(node, depth, maxdepth, wordset, solutions, iterations = 0):
     if depth == 1:
-        print(str(iterations / len(wordset)))
+        print("Progress: " + str(iterations / len(wordset)))
         iterations += 1
 
     if depth < maxdepth:
         words = wordmatcher(node.state, wordset)
 
-        print((depth * 3 * " ") + "Iterating over " + str(len(words)) + " on depth " + str(depth) + " in tree...", file=log)
+        if debug:
+            print((depth * 3 * " ") + "Iterating over " + str(len(words)) + " on depth " + str(depth) + " in tree...", file=log)
 
         for word in words:
             newnode = treenode(node.state, node)
@@ -50,20 +51,25 @@ def treebuilder(node, depth, maxdepth, wordset, solutions, iterations = 0):
             
             node.addchild(newnode)
 
-            print((depth * 3 * " ") + word, file=log)
+            if debug:
+                print((depth * 3 * " ") + word, file=log)
         
             treebuilder(newnode, depth + 1, maxdepth, wordset, solutions, iterations)
     else:
         solutions.append(node)
 
         print("Solutions found: " + str(len(solutions)))
-        
-        print((depth * 3 * " ") + "Solution: " + str(len(solutions)), file=log)
-        for row in node.state:
-            print((depth * 3 * " ") + row, file=log)
+            
+        if debug:
+            print((depth * 3 * " ") + "Solution: " + str(len(solutions)), file=log)
+            for row in node.state:
+                print((depth * 3 * " ") + row, file=log)
+
+debug = False
 
 try:
-    log = open("solution_trace.log", 'w')
+    if debug:
+        log = open("solution_trace.log", 'w')
 
     maxdepth = 5
     
@@ -76,9 +82,18 @@ try:
 
     treebuilder(root, 0, maxdepth, wordset, solutions)
 except KeyboardInterrupt:
+    out = open("solution_list.txt", 'w')
+
     for solution in solutions:
         print(30 * 'v')
         for row in solution.state:
             print(row)
+
+        print(30 * 'v', file=out)
+        for row in solution.state:
+            print(row, file=out)
+
+    out.close()
 finally:
-    log.close()
+    if debug:
+        log.close()
