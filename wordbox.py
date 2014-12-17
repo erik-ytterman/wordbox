@@ -1,9 +1,5 @@
 #! /usr/bin/python3
 import sys
-import random
-import itertools
-import copy
-import re
 
 class treenode:
     state = None
