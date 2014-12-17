@@ -38,15 +38,6 @@ def wordmatcher(state, wordset):
 
         return { word for word in wordset if charmatcher(word, charsets) }
 
-def printsolution(node, recurse = False):
-    if not node == None:
-        for row in node.state:
-            print(row)
-        
-        if recurse:
-            print(30 * '-')
-            printpath(node.parent)
-
 def treebuilder(node, depth, maxdepth, wordset, solutions, verbose = False):
     if depth < maxdepth:
         for word in wordmatcher(node.state, wordset):
@@ -65,6 +56,15 @@ def treebuilder(node, depth, maxdepth, wordset, solutions, verbose = False):
             print(30 * '^')
         else:
             print("Solutions found: " + str(len(solutions)))
+
+def printsolution(node, recurse = False):
+    if not node == None:
+        for row in node.state:
+            print(row)
+        
+        if recurse:
+            print(30 * '-')
+            printpath(node.parent)
 
 maxdepth = 5
 normalizer = lambda line: line.strip().upper()
