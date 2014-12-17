@@ -38,7 +38,7 @@ def wordmatcher(state, wordset):
 
         return { word for word in wordset if charmatcher(word, charsets) }
 
-def treebuilder(node, depth, maxdepth, wordset, solutions, verbose = False):
+def treebuilder(node, depth, maxdepth, wordset, solutions):
     if depth < maxdepth:
         for word in wordmatcher(node.state, wordset):
             newnode = treenode(node.state, node)
@@ -46,25 +46,10 @@ def treebuilder(node, depth, maxdepth, wordset, solutions, verbose = False):
             
             node.addchild(newnode)
         
-            treebuilder(newnode, depth + 1, maxdepth, wordset, solutions, verbose)
+            treebuilder(newnode, depth + 1, maxdepth, wordset, solutions)
     else:
         solutions.append(node)
-
-        if verbose:
-            print(30 * 'v')
-            printsolution(node)
-            print(30 * '^')
-        else:
-            print("Solutions found: " + str(len(solutions)))
-
-def printsolution(node, recurse = False):
-    if not node == None:
-        for row in node.state:
-            print(row)
-        
-        if recurse:
-            print(30 * '-')
-            printpath(node.parent)
+        print("Solutions found: " + str(len(solutions)))
 
 maxdepth = 5
 normalizer = lambda line: line.strip().upper()
@@ -72,9 +57,9 @@ worddata = [ normalizer(word) for word in open("swedish-word-list.txt", encoding
 wordset = { word for word in sorted(worddata) if len(word) == maxdepth }
 
 solutions = []
-root = treenode([], None)
 
 try:
+    root = treenode([], None)
     treebuilder(root, 0, maxdepth, wordset, solutions)
 except KeyboardInterrupt:
     for solution in solutions:
