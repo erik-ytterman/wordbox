@@ -34,31 +34,51 @@ def wordmatcher(state, wordset):
 
         return { word for word in wordset if charmatcher(word, charsets) }
 
-def treebuilder(node, depth, maxdepth, wordset, solutions):
+def treebuilder(node, depth, maxdepth, wordset, solutions, iterations = 0):
+    if depth == 1:
+        print(str(iterations / len(wordset)))
+        iterations += 1
+
     if depth < maxdepth:
-        for word in wordmatcher(node.state, wordset):
+        words = wordmatcher(node.state, wordset)
+
+        print((depth * 3 * " ") + "Iterating over " + str(len(words)) + " on depth " + str(depth) + " in tree...", file=log)
+
+        for word in words:
             newnode = treenode(node.state, node)
             newnode.addword(word)
             
             node.addchild(newnode)
+
+            print((depth * 3 * " ") + word, file=log)
         
-            treebuilder(newnode, depth + 1, maxdepth, wordset, solutions)
+            treebuilder(newnode, depth + 1, maxdepth, wordset, solutions, iterations)
     else:
         solutions.append(node)
+
         print("Solutions found: " + str(len(solutions)))
-
-maxdepth = 5
-normalizer = lambda line: line.strip().upper()
-worddata = [ normalizer(word) for word in open("swedish-word-list.txt", encoding="ISO-8859-1") ]
-wordset = { word for word in sorted(worddata) if len(word) == maxdepth }
-
-solutions = []
+        
+        print((depth * 3 * " ") + "Solution: " + str(len(solutions)), file=log)
+        for row in node.state:
+            print((depth * 3 * " ") + row, file=log)
 
 try:
+    log = open("solution_trace.log", 'w')
+
+    maxdepth = 5
+    
+    normalizer = lambda line: line.strip().upper()
+    worddata = [ normalizer(word) for word in open("swedish-word-list.txt", encoding="ISO-8859-1") ]
+    wordset = { word for word in sorted(worddata) if len(word) == maxdepth }
+
+    solutions = []
     root = treenode([], None)
+
     treebuilder(root, 0, maxdepth, wordset, solutions)
 except KeyboardInterrupt:
     for solution in solutions:
         print(30 * 'v')
         for row in solution.state:
             print(row)
+finally:
+    log.close()
