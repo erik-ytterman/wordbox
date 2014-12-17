@@ -14,6 +14,12 @@ class treenode:
         self.parent = parent
         self.state = list(state)
 
+    def addword(self, word):
+        self.state.append(word)
+
+    def addchild(self, childnode):
+        self.children.append(childnode)
+
 def charmatcher(word, charsets):
     return ( False not in [ word[i] in charsets[i] for i in range(max(len(word), len(charsets))) ] )
         
@@ -45,10 +51,9 @@ def treebuilder(node, depth, maxdepth, wordset, solutions, verbose = False):
     if depth < maxdepth:
         for word in wordmatcher(node.state, wordset):
             newnode = treenode(node.state, node)
+            newnode.addword(word)
             
-            newnode.state.append(word)
-            
-            node.children.append(newnode)
+            node.addchild(newnode)
         
             treebuilder(newnode, depth + 1, maxdepth, wordset, solutions, verbose)
     else:
