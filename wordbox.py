@@ -1,8 +1,15 @@
 #! /usr/bin/python3
 import sys
 
-# Configure
+#--------------------------------------------------------------
+# Configuration
+#--------------------------------------------------------------
+
 maxdepth = columns = rows = 5
+
+#--------------------------------------------------------------
+# Data structures
+#--------------------------------------------------------------
 
 class treenode:
    state = None
@@ -18,6 +25,10 @@ class treenode:
 
    def addchild(self, childnode):
       self.children.append(childnode)
+
+#--------------------------------------------------------------
+# Algorithm
+#--------------------------------------------------------------
 
 def rowfinder(state, wordset):
     # Create keys from the columns of the present playfield 
