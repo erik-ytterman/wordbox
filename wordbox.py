@@ -13,11 +13,11 @@ The class has three members:
 
 state:     A list containing the playfield state. Every member 
            is a row in the playfield. The first member (0) is 
-           the topmost row, the last (len(state)-1) is the bottom 
-           row.
+           the topmost row, the last (len(state)-1) is the 
+           bottom row.
 
-parent:    A reference to the parent node in the tree, with value 
-           None if this is the root node.
+parent:    A reference to the parent node in the tree, with 
+           value None if this is the root node.
 
 children:  References to all child nodes.
 """
@@ -72,8 +72,8 @@ wordset: A complete set of possible words
 
 The function returns:
 
-A set of words that are valid for the next (empty) row in the 
-playfield, given the present playfield state
+A set of words that are valid for the next (empty) row in 
+the playfield, given the present playfield state
 """
 def rowfinder(state, wordset):
    # Filter wordset if there are words in the playfield
