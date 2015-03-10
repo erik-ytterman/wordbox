@@ -41,14 +41,14 @@ class treenode:
 #--------------------------------------------------------------
 
 """
-Configure number of rows and columns in the playfield. At present 
-only square (rows = columns) playfields are supported.
+Configure number of rows and columns in the playfield. At 
+present only square (rows = columns) playfields are supported.
 """
 rows = columns = 5
 
 """
-Define a list that will contain references to the valid solutions 
-found in the solution tree leafs.
+Define a list that will contain references to the valid 
+solutions found in the solution tree leafs.
 """
 solutions = []
 
@@ -109,14 +109,13 @@ def treebuilder(node, depth, rows, wordset, solutions):
    if depth == rows:
       solutions.append(node)
       print("%d solutons found..." % len(solutions))
+
    else:
       words = rowfinder(node.state, wordset)
       
       for word in words:
          newnode = treenode(node.state, node)
-         
          newnode.addword(word)
-         
          node.addchild(newnode)
             
          treebuilder(newnode, depth + 1, rows, wordset, solutions)
@@ -127,13 +126,10 @@ def treebuilder(node, depth, rows, wordset, solutions):
             
 try:
    normalizer = lambda line: line.strip().upper()
-   
    worddata = [ normalizer(word) for word in open("swedish-word-list.txt", encoding="ISO-8859-1") ]
-   
    wordset = { word for word in sorted(worddata) if len(word) == columns }
    
    root = treenode([], None)
-    
    treebuilder(root, 0, rows, wordset, solutions)
 
 except KeyboardInterrupt:
