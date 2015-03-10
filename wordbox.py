@@ -31,38 +31,33 @@ class treenode:
 #--------------------------------------------------------------
 
 def rowfinder(state, wordset):
-   
-   # Create keys from the columns of the present playfield 
-   columnkeys = [ ''.join(t) for t in zip(*state) ]
+   # If this is not the first line, where every word is a candidate
+   if not state == []:
+      # Create keys from the columns of the present playfield 
+      columnkeys = [ ''.join(t) for t in zip(*state) ]
 
-   # Filter out the words, matching the key for each column
-   columnwords = [ [ word for word in wordset if word.startswith(columnkey) ] for columnkey in columnkeys ]
+      # Filter out the words, matching the key for each column
+      columnwords = [ [ word for word in wordset if word.startswith(columnkey) ] for columnkey in columnkeys ]
    
-   # Get the index of the row to be found (the playfield is a list of rows)
-   row = len(state)
+      # Get the index of the row to be found (the playfield is a list of rows)
+      row = len(state)
 
-   # For every column in the playfield
-   for column in range(columns):
-      # Get the possible characters (charset) for every word position (column),
-      # derived from the possible column words (columnwords)
-      charset = { word[row] for word in columnwords[column] }
+      # For every column in the playfield
+      for column in range(columns):
+         # Get the possible characters (charset) for every word position (column),
+         # derived from the possible column words (columnwords)
+         charset = { word[row] for word in columnwords[column] }
       
-      # Reduce the full wordset, finding words with a charcter in the present
-      # word position (column) matching the possible characters (charset) for
-      # this columnm, until ony valid words are left
-      wordset = { word for word in wordset if word[column] in charset }
+         # Reduce the full wordset, finding words with a charcter in the present
+         # word position (column) matching the possible characters (charset) for
+         # this columnm, until ony valid words are left
+         wordset = { word for word in wordset if word[column] in charset }
       
    return wordset
-        
-def wordmatcher(state, wordset):
-    if state == []:
-       return wordset
-    else:
-       return rowfinder(state, wordset)
 
 def treebuilder(node, depth, maxdepth, wordset, solutions):
    if depth < maxdepth:
-      words = wordmatcher(node.state, wordset)
+      words = rowfinder(node.state, wordset)
       
       for word in words:
          newnode = treenode(node.state, node)
