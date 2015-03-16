@@ -11,20 +11,33 @@ searching for solutions.
 
 The class has three members:
 
-state:     A list containing the playfield state. Every member 
-           is a row in the playfield. The first member (0) is 
-           the topmost row, the last (len(state)-1) is the 
-           bottom row.
+state:        A list containing the playfield state. Every member 
+              is a row in the playfield. The first member (0) is 
+              the topmost row, the last (len(state)-1) is the 
+              bottom row.
 
-parent:    A reference to the parent node in the tree, with 
-           value None if this is the root node.
+row:          An integer with the index for the next word in the
+              playfield list that we are trying to find
 
-children:  References to all child nodes.
+columnkeys:   A list containing the key used to filter out possible
+              words for a specific column
+
+columnwords:  A list containing the possible words for a specific
+              column
+
+parent:       A reference to the parent node in the tree, with 
+              value None if this is the root node.
+
+children:     References to all child nodes.
 """
 class treenode:
    state = None
+
    columnkeys = None
    columnwords = None
+   charsets = None
+   row = 0
+   rowwords = None
 
    parent = None
    children = []
@@ -33,10 +46,7 @@ class treenode:
       self.parent = parent
       self.state = list(state)
 
-   def print(self):
-      print(30 * 'v')
-      for row in self.state:
-         print(row)      
+
 
    def addword(self, word):
       self.state.append(word)
@@ -86,6 +96,8 @@ the playfield, given the present playfield state
 def rowfinder(node, wordset):
    # Filter wordset if there are words in the playfield
    # otherwise, every word is a candidate
+   rowwords = wordset
+
    if not node.state == []:
       # Create "keys" from the columns of the present playfield 
       node.columnkeys = [ ''.join(t) for t in zip(*node.state) ]
@@ -94,39 +106,81 @@ def rowfinder(node, wordset):
       node.columnwords = [ [ word for word in wordset if word.startswith(columnkey) ] for columnkey in node.columnkeys ]
    
       # Get the index of the next row to be found 
-      row = len(node.state)
+      node.row = len(node.state)
 
-      # For every column in the playfield
+      # Get the possible characters (charset) for every word position (column),
+      # derived from the possible column words (columnwords)
+      node.charsets = [ { word[node.row] for word in node.columnwords[column] } for column in range(columns) ]
+
+      # For every column in the playfield, filter away words that does not match
       for column in range(columns):
-         # Get the possible characters (charset) for every word position (column),
-         # derived from the possible column words (columnwords)
-         charset = { word[row] for word in node.columnwords[column] }
-      
          # Reduce the full wordset, finding words with a charcter in the present
          # word position (column) matching the possible characters (charset) for
          # this columnm, until ony valid words are left
-         wordset = { word for word in wordset if word[column] in charset }
+         rowwords = { word for word in rowwords if word[column] in node.charsets[column] }
 
-   return wordset
+      node.rowwords = rowwords
+
+   return rowwords
 
 """
 The treebuilder function build a solution tree, one level 
 for each row in the playfield. 
 """
 def treebuilder(node, depth, rows, wordset, solutions):
-   if depth == rows:
-      solutions.append(node)
-      print("%d solutions found..." % len(solutions))
+   if len(solutions) < 1:
+      if depth == rows:
+         node.row = depth
+         solutions.append(node)
+         print("%d solutions found..." % len(solutions))
 
-   else:
-      words = rowfinder(node, wordset)
-      
-      for word in words:
-         newnode = treenode(node.state, node)
-         newnode.addword(word)
-         node.addchild(newnode)
+      else:
+         words = rowfinder(node, wordset)
+         
+         for word in words:
+            newnode = treenode(node.state, node)
+            newnode.addword(word)
+            node.addchild(newnode)
             
-         treebuilder(newnode, depth + 1, rows, wordset, solutions)
+            treebuilder(newnode, depth + 1, rows, wordset, solutions)
+
+#--------------------------------------------------------------
+# Helpers
+#--------------------------------------------------------------
+
+def printnode(node):
+   # Print state
+   print(30 * str(node.row))
+   for row in node.state:
+      print(row)
+      
+   # Print column keys and words
+   if not node.columnkeys == None:
+      print(30 * "-")
+      for i, columnkey in enumerate(node.columnkeys):
+         if len(node.columnwords[i]) <= 7:
+            print("Key for column: %d is %s -> %s" % (i, columnkey, node.columnwords[i]))
+         else:
+            print("Key for column: %d is %s -> %s" % (i, columnkey, "MANY"))
+            
+   if not node.charsets == None:
+      print(30 * "+")
+      for i, charset in enumerate(node.charsets):
+         print("Charset for column: %d is %s" % (i, charset))
+      if len(node.rowwords) <= 7:
+         print("Possible words: %s" % (node.rowwords))
+      else:
+         print("Possible words: %s" % ("MANY"))
+
+   print(30 * str(node.row))
+
+def backtrack(node, track):
+   if not node.parent == None:
+      backtrack(node.parent, track)
+      
+   track.append(node)
+
+   return track
 
 #--------------------------------------------------------------
 # Main program
@@ -146,5 +200,6 @@ except KeyboardInterrupt:
    print(30 * 'x')
 
 finally:
-   for solution in solutions:
-      solution.print()
+   levels = backtrack(solutions[0], [])
+   for level in levels:
+      printnode(level)
