@@ -108,7 +108,7 @@ for each row in the playfield.
 def treebuilder(node, depth, rows, wordset, solutions):
    if depth == rows:
       solutions.append(node)
-      print("%d solutons found..." % len(solutions))
+      print("%d solutions found..." % len(solutions))
 
    else:
       words = rowfinder(node.state, wordset)
