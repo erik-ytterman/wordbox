@@ -23,13 +23,21 @@ children:  References to all child nodes.
 """
 class treenode:
    state = None
+   columnkeys = None
+   columnwords = None
+
    parent = None
    children = []
     
    def __init__(self, state, parent):
       self.parent = parent
       self.state = list(state)
-      
+
+   def print(self):
+      print(30 * 'v')
+      for row in self.state:
+         print(row)      
+
    def addword(self, word):
       self.state.append(word)
 
@@ -75,24 +83,24 @@ The function returns:
 A set of words that are valid for the next (empty) row in 
 the playfield, given the present playfield state
 """
-def rowfinder(state, wordset):
+def rowfinder(node, wordset):
    # Filter wordset if there are words in the playfield
    # otherwise, every word is a candidate
-   if not state == []:
+   if not node.state == []:
       # Create "keys" from the columns of the present playfield 
-      columnkeys = [ ''.join(t) for t in zip(*state) ]
+      node.columnkeys = [ ''.join(t) for t in zip(*node.state) ]
 
       # Filter out the words, matching the "key" for each column
-      columnwords = [ [ word for word in wordset if word.startswith(columnkey) ] for columnkey in columnkeys ]
+      node.columnwords = [ [ word for word in wordset if word.startswith(columnkey) ] for columnkey in node.columnkeys ]
    
       # Get the index of the next row to be found 
-      row = len(state)
+      row = len(node.state)
 
       # For every column in the playfield
       for column in range(columns):
          # Get the possible characters (charset) for every word position (column),
          # derived from the possible column words (columnwords)
-         charset = { word[row] for word in columnwords[column] }
+         charset = { word[row] for word in node.columnwords[column] }
       
          # Reduce the full wordset, finding words with a charcter in the present
          # word position (column) matching the possible characters (charset) for
@@ -111,7 +119,7 @@ def treebuilder(node, depth, rows, wordset, solutions):
       print("%d solutions found..." % len(solutions))
 
    else:
-      words = rowfinder(node.state, wordset)
+      words = rowfinder(node, wordset)
       
       for word in words:
          newnode = treenode(node.state, node)
@@ -139,6 +147,4 @@ except KeyboardInterrupt:
 
 finally:
    for solution in solutions:
-      print(30 * 'v')
-      for row in solution.state:
-         print(row)
+      solution.print()
