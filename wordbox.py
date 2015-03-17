@@ -143,9 +143,24 @@ def treebuilder(node, depth, rows, wordset, solutions):
             
             treebuilder(newnode, depth + 1, rows, wordset, solutions)
 
+def backtracker(node, track = []):
+   if not node.parent == None:
+      backtracker(node.parent, track)
+      
+   track.append(node)
+
+   return track
+
 #--------------------------------------------------------------
 # Helpers
 #--------------------------------------------------------------
+
+def loadwords(filename = "swedish-word-list.txt"):
+   normalizer = lambda line: line.strip().upper()
+   worddata = [ normalizer(word) for word in open(filename, encoding="ISO-8859-1") ]
+   wordset = { word for word in sorted(worddata) if len(word) == columns }
+   
+   return wordset
 
 def printnode(node):
    # Print state
@@ -173,23 +188,12 @@ def printnode(node):
 
    print(30 * str(node.row))
 
-def backtrack(node, track = []):
-   if not node.parent == None:
-      backtrack(node.parent, track)
-      
-   track.append(node)
-
-   return track
-
 #--------------------------------------------------------------
 # Main program
 #--------------------------------------------------------------
             
 try:
-   normalizer = lambda line: line.strip().upper()
-   worddata = [ normalizer(word) for word in open("swedish-word-list.txt", encoding="ISO-8859-1") ]
-   wordset = { word for word in sorted(worddata) if len(word) == columns }
-   
+   wordset = loadwords()
    root = treenode([], None)
    treebuilder(root, 0, rows, wordset, solutions)
 
@@ -199,6 +203,6 @@ except KeyboardInterrupt:
    print(30 * 'x')
 
 finally:
-   levels = backtrack(solutions[0])
-   for level in levels:
-      printnode(level)
+   stages = backtracker(solutions[0])
+   for stage in stages:
+      printnode(stage)
