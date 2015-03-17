@@ -143,6 +143,26 @@ def treebuilder(node, depth, rows, wordset, solutions):
             
             treebuilder(newnode, depth + 1, rows, wordset, solutions)
 
+"""
+The backtracker function is used to restore the path upwards 
+in the tree to build a backtrack (list of tree nodes created) 
+for a specific solution. 
+
+Observe that this function is recursing to the 'top' node of 
+the tree (parent == None) first, and add the elements of the 
+track when returning
+
+The function take two parameters:
+
+node:    The solutuion node (leaf) in the tree
+
+track:   The path to the solution, modified for each recursion
+
+The function returns:
+
+A list of solution tree nodest, with the top node of the tree
+first and the solution node (leaf) last
+"""
 def backtracker(node, track = []):
    if not node.parent == None:
       backtracker(node.parent, track)
