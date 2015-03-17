@@ -46,8 +46,6 @@ class treenode:
       self.parent = parent
       self.state = list(state)
 
-
-
    def addword(self, word):
       self.state.append(word)
 
@@ -114,11 +112,12 @@ def rowfinder(node, wordset):
 
       # For every column in the playfield, filter away words that does not match
       for column in range(columns):
+         rowwords = { word for word in rowwords if word[column] in node.charsets[column] }
          # Reduce the full wordset, finding words with a charcter in the present
          # word position (column) matching the possible characters (charset) for
          # this columnm, until ony valid words are left
-         rowwords = { word for word in rowwords if word[column] in node.charsets[column] }
 
+      # Store possible rows in solution treez
       node.rowwords = rowwords
 
    return rowwords
@@ -174,7 +173,7 @@ def printnode(node):
 
    print(30 * str(node.row))
 
-def backtrack(node, track):
+def backtrack(node, track = []):
    if not node.parent == None:
       backtrack(node.parent, track)
       
@@ -200,6 +199,6 @@ except KeyboardInterrupt:
    print(30 * 'x')
 
 finally:
-   levels = backtrack(solutions[0], [])
+   levels = backtrack(solutions[0])
    for level in levels:
       printnode(level)
