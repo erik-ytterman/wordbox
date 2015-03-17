@@ -1,6 +1,9 @@
 #! /usr/bin/python3
 import sys
 
+from wordboxutils.loaders import loadwords
+from wordboxutils.reporting import printnode
+
 #--------------------------------------------------------------
 # Data types
 #--------------------------------------------------------------
@@ -172,48 +175,11 @@ def backtracker(node, track = []):
    return track
 
 #--------------------------------------------------------------
-# Helpers
-#--------------------------------------------------------------
-
-def loadwords(filename = r'../swedish-word-list.txt'):
-   normalizer = lambda line: line.strip().upper()
-   worddata = [ normalizer(word) for word in open(filename, encoding="ISO-8859-1") ]
-   wordset = { word for word in sorted(worddata) if len(word) == columns }
-   
-   return wordset
-
-def printnode(node):
-   # Print state
-   print(30 * str(node.row))
-   for row in node.state:
-      print(row)
-      
-   # Print column keys and words
-   if not node.columnkeys == None:
-      print(30 * "-")
-      for i, columnkey in enumerate(node.columnkeys):
-         if len(node.columnwords[i]) <= 7:
-            print("Key for column: %d is %s -> %s" % (i, columnkey, node.columnwords[i]))
-         else:
-            print("Key for column: %d is %s -> %s" % (i, columnkey, "MANY"))
-            
-   if not node.charsets == None:
-      print(30 * "+")
-      for i, charset in enumerate(node.charsets):
-         print("Charset for column: %d is %s" % (i, charset))
-      if len(node.rowwords) <= 7:
-         print("Possible words: %s" % (node.rowwords))
-      else:
-         print("Possible words: %s" % ("MANY"))
-
-   print(30 * str(node.row))
-
-#--------------------------------------------------------------
 # Main program
 #--------------------------------------------------------------
             
 try:
-   wordset = loadwords()
+   wordset = loadwords(columns)
    root = treenode([], None)
    treebuilder(root, 0, rows, wordset, solutions)
 
