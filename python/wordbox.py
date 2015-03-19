@@ -19,15 +19,6 @@ state:        A list containing the playfield state. Every member
               the topmost row, the last (len(state)-1) is the 
               bottom row.
 
-row:          An integer with the index for the next word in the
-              playfield list that we are trying to find
-
-columnkeys:   A list containing the key used to filter out possible
-              words for a specific column
-
-columnwords:  A list containing the possible words for a specific
-              column
-
 parent:       A reference to the parent node in the tree, with 
               value None if this is the root node.
 
@@ -35,13 +26,6 @@ children:     References to all child nodes.
 """
 class treenode:
    state = None
-
-   columnkeys = None
-   columnwords = None
-   charsets = None
-   row = 0
-   rowwords = None
-
    parent = None
    children = []
     
@@ -101,28 +85,24 @@ def rowfinder(node, wordset):
 
    if not node.state == []:
       # Create "keys" from the columns of the present playfield 
-      node.columnkeys = [ ''.join(t) for t in zip(*node.state) ]
+      columnkeys = [ ''.join(t) for t in zip(*node.state) ]
 
       # Filter out the words, matching the "key" for each column
-      node.columnwords = [ [ word for word in wordset if word.startswith(columnkey) ] for columnkey in node.columnkeys ]
+      columnwords = [ [ word for word in wordset if word.startswith(columnkey) ] for columnkey in columnkeys ]
    
       # Get the index of the next row to be found 
-      node.row = len(node.state)
+      row = len(node.state)
 
       # Get the possible characters (charset) for every word position (column),
       # derived from the possible column words (columnwords)
-      node.charsets = [ { word[node.row] for word in node.columnwords[column] } for column in range(columns) ]
+      charsets = [ { word[row] for word in columnwords[column] } for column in range(columns) ]
 
       # For every column in the playfield, filter away words that does not match
       for column in range(columns):
-         rowwords = { word for word in rowwords if word[column] in node.charsets[column] }
+         rowwords = { word for word in rowwords if word[column] in charsets[column] }
          # Reduce the full wordset, finding words with a charcter in the present
          # word position (column) matching the possible characters (charset) for
          # this columnm, until ony valid words are left
-
-      # Store possible rows in solution treez
-      node.rowwords = rowwords
-
    return rowwords
 
 """
@@ -190,5 +170,5 @@ except KeyboardInterrupt:
 
 finally:
    stages = backtracker(solutions[0])
-   for stage in stages:
-      printnode(stage)
+   for i, node in enumerate(stages):
+      printnode(i, node)
