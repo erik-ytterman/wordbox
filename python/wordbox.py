@@ -112,7 +112,6 @@ for each row in the playfield.
 def treebuilder(node, depth, rows, wordset, solutions):
    if len(solutions) < 1:
       if depth == rows:
-         node.row = depth
          solutions.append(node)
          print("%d solutions found..." % len(solutions))
 
